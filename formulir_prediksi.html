@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-DEBAR - ELECTRONIC WEB-BASED DETECTION OF DENGUE FEVER</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #0078D7;
+      --primary-dark: #005fa3;
+      --secondary: #21C36A;
+      --background: linear-gradient(135deg, #d8f3dc, #a7c7e7);
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --border-color: #d1e7dd;
+      --text-dark: #1b4332;
+      --text-muted: #5a5a5a;
+      --shadow: 0 4px 10px rgba(0,0,0,0.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--background);
+      color: var(--text-dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-align: center;
+      padding: 1.8rem 1rem;
+      box-shadow: var(--shadow);
+      border-bottom-left-radius: var(--radius);
+      border-bottom-right-radius: var(--radius);
+    }
+
+    .logo {
+      max-width: 110px;
+      height: auto;
+      display: block;
+      margin: 0 auto 12px auto;
+      border-radius: 10px;
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      margin-bottom: 0.3rem;
+      font-weight: 700;
+    }
+
+    p.lead {
+      font-size: 0.95rem;
+      color: #eafaf1;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .back-home {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .back-home:hover {
+      background: rgba(255, 255, 255, 0.26);
+      transform: translateY(-1px);
+    }
+
+    /* Grid utama */
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    aside, section {
+      flex: 1 1 360px;
+      min-width: 320px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover { transform: translateY(-3px); }
+
+    h3 { margin-top: 0.5rem; font-size: 1.25rem; color: var(--primary-dark); }
+    h4 { font-size: 1rem; margin-top: 1rem; color: var(--text-dark); }
+
+    label { font-weight: 600; font-size: 0.9rem; margin-top: 0.5rem; display: block; color: var(--text-dark); }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border-radius: 10px;
+      border: 1px solid #cde3d7;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      background-color: #f8fff8;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(33,195,106,0.2);
+      background-color: #ffffff;
+    }
+
+    textarea { height: 120px; resize: vertical; }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    button:hover { background: var(--primary-dark); transform: scale(1.02); }
+    button:active { transform: scale(0.98); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    @media (min-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.5rem; }
+    .checkbox-item {
+      background: #f1faf4;
+      border: 1px solid #cde3d7;
+      border-radius: 8px;
+      padding: 0.4rem 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+    }
+
+    pre.code-block {
+      background: #f0f9f7;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      color: #084c61;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid #cde3d7;
+      padding-top: 0.75rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+  /* Tambah jarak antara kartu Data Historis dan Data Eksogen untuk keterbacaan */
+  aside .card + .card { margin-top: 1.2rem; padding-top: 0.8rem; border-top: 1px dashed rgba(29,78,66,0.06); }
+
+  /* Grafik responsif: gunakan wrapper yang mengontrol tinggi, bukan aturan !important pada canvas */
+    .chart-wrapper { width: 100%; min-height: 460px; display: block; }
+    .chart-wrapper canvas { width: 100%; height: 100%; display: block; }
+    @media (max-width: 992px) { .chart-wrapper { min-height: 420px; } }
+    @media (max-width: 768px) { .chart-wrapper { min-height: 360px; } }
+    @media (max-width: 576px) { .chart-wrapper { min-height: 300px; } }
+
+  .pred-table-container { overflow-x: auto; margin-top: 0.5rem; }
+  /* Beri sedikit jarak di bawah pilihan variabel eksogen supaya input masa depan terlihat lebih terpisah */
+  #exog-vars-selector { margin-bottom: 1.25rem; }
+    .pred-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      min-width: 320px;
+      background-color: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .pred-table thead th {
+      background: var(--primary);
+      color: white;
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    .pred-table tbody td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eef3f8;
+    }
+
+    .pred-table tbody tr:nth-child(even) { background: #f9fcff; }
+    .pred-table tbody tr:nth-child(odd) { background: #ffffff; }
+
+    .pred-table tbody td.number {
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .small-btn {
+      background: linear-gradient(180deg,#366dbe,);
+      color: white;
+      border: none;
+      padding: 0.45rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 6px rgba(11,78,215,0.12);
+    }
+    .small-btn:active { transform: translateY(1px); }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background-color: #e6f5ec;
+      margin-top: auto;
+      border-top: 1px solid #cde3d7;
+    }
+
+    /* Responsif tambahan */
+    @media (max-width: 480px) {
+      .header-inner {
+        padding-top: 3.6rem;
+      }
+      .back-home {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: max-content;
+      }
+      .back-home:hover {
+        transform: translateX(-50%) translateY(-1px);
+      }
+      h1 { font-size: 1.6rem; }
+      p.lead { font-size: 0.85rem; }
+      label, input, select, textarea, button { font-size: 0.85rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-inner">
+      <a class="back-home" href="index.html">Kembali ke Beranda</a>
+      <img src="LOGO E-DEBR.png" alt="Logo E-DEBAR" class="logo" />
+      <h1>E-DEBAR</h1>
+      <p class="lead">ELECTRONIC WEB-BASED DETECTION OF DENGUE FEVER (Formulir Prediksi Kasus DBD) untuk Pencegahan Dini Berdasarkan Data Historis</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Bagian kiri -->
+    <aside>
+      <div class="card">
+        <h3>1. Data Historis & Model</h3>
+        <label>Contoh Data CSV (12 Bulan)</label>
+        <pre class="code-block">month,cases,rain,temp,humidity,fogging,pop_density
+2024-10,5,120,27.3,78,0,3500
+2024-11,8,240,26.8,82,1,3500
+2024-12,12,300,26.5,85,1,3500
+2025-01,15,320,26.4,86,2,3510
+2025-02,10,250,26.7,84,1,3510
+2025-03,7,180,27.1,80,0,3510
+2025-04,4,100,27.5,77,0,3520
+2025-05,3,80,27.8,75,0,3520
+2025-06,4,60,27.6,76,0,3520
+2025-07,6,90,27.4,78,1,3530
+2025-08,9,150,27.2,81,0,3530
+2025-09,7,130,27.3,79,0,3530</pre>
+
+        <label for="csvdata">Input Data CSV (12 baris)</label>
+        <textarea id="csvdata" placeholder="Tempel data CSV di sini..."></textarea>
+
+        <div class="grid-2">
+          <div>
+            <label for="modelSelect">Pilih Model</label>
+            <select id="modelSelect">
+              <option value="arimax">ARIMAX-like</option>
+              <option value="seasonal_naive">Seasonal Naive</option>
+            </select>
+          </div>
+          <div>
+            <label for="transform">Transformasi Target</label>
+            <select id="transform">
+              <option value="none">None</option>
+              <option value="log1p" selected>log(cases+1)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label for="p_lags">Lag Autoregresif (p)</label>
+            <input type="number" id="p_lags" value="2" min="0" max="6">
+          </div>
+          <div>
+            <label for="horizon">Horizon Prediksi (bulan)</label>
+            <input type="number" id="horizon" value="12" min="1" max="24">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>2. Data Eksogen Masa Depan</h3>
+        <div id="exog-vars-selector" class="checkbox-group">
+          <div class="checkbox-item"><input type="checkbox" id="chk_rain" checked><label for="chk_rain">Curah Hujan</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="chk_temp" checked><label for="chk_temp">Suhu</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="chk_hum" checked><label for="chk_hum">Kelembapan</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="chk_fog" checked><label for="chk_fog">Fogging</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="chk_pop" checked><label for="chk_pop">Kepadatan Pop.</label></div>
+        </div>
+
+        <div class="grid-2">
+          <div><label for="rain_future">Curah Hujan (mm)</label><input id="rain_future" type="text" placeholder="cth: 120,100,80,..."></div>
+          <div><label for="temp_future">Suhu (°C)</label><input id="temp_future" type="text" placeholder="cth: 27.0,26.5,..."></div>
+        </div>
+        <div class="grid-2">
+          <div><label for="hum_future">Kelembapan (%)</label><input id="hum_future" type="text" placeholder="cth: 78,76,..."></div>
+          <div><label for="fog_future">Fogging</label><input id="fog_future" type="text" placeholder="cth: 0,1,0,..."></div>
+        </div>
+        <div><label for="pop_future">Kepadatan Populasi</label><input id="pop_future" type="text" placeholder="cth: 3500,3510,..."></div>
+
+        <div style="margin-top:1rem;"><button id="btnParse">Bangun Model & Prediksi</button></div>
+        <div class="footer-note"></div>
+      </div>
+    </aside>
+
+    <!-- Bagian kanan -->
+    <section>
+      <div class="card">
+        <h3>Hasil Prediksi & Grafik</h3>
+        <div class="chart-wrapper">
+          <canvas id="chartForecast"></canvas>
+        </div>
+        <div style="margin-top:1rem;">
+          <h4>Ringkasan Model</h4>
+          <div id="summaryText" style="font-size:0.85rem;color:var(--text-muted)">Belum ada model.</div>
+          <h4 style="margin-top:1rem;">Metrik (Backtest)</h4>
+          <div id="metrics" style="font-size:0.85rem;color:var(--text-muted)">-</div>
+          <div id="estimation" style="margin-top:1rem;">
+            <p id="riskLevel" style="font-weight:bold; font-size:1.1em; margin-bottom:4px;"></p>
+            <p id="estTotal" style="margin-top:0;"></p>
+
+            <div id="predTableContainer" class="pred-table-container">
+              <table id="predTable" class="pred-table" aria-label="Tabel prediksi per bulan">
+                <thead><tr><th>Bulan</th><th>Prediksi Kasus</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="download-controls" style="margin-top:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button id="btnDownloadImage" class="small-btn">Download Gambar</button>
+              <button id="btnDownloadCSV" class="small-btn">Download Excel</button>
+              <button id="btnDownloadPDF" class="small-btn">Download PDF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>oleh Tim KIR SMA Negeri 1 Blahbatuh</footer>
+  <footer>© 2025 E-DEBAR | Electronic Web-Based Detection of Dengue Fever</footer>
+
+  <script>
+    // --- KODE JAVASCRIPT ANDA DI SINI ---
+    // (JavaScript dari jawaban sebelumnya dengan modifikasi)
+
+    // Utility parsers (sama, tidak ada perubahan)
+    function csvToRows(text){
+        const lines = text.trim().split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+        if(lines.length===0) return [];
+        const header = lines[0].split(',').map(h=>h.trim());
+        const rows = lines.slice(1).map(l=>{
+            const cols = l.split(',').map(z=>z.trim());
+            const obj = {};
+            header.forEach((h,i)=>obj[h]=cols[i]||'');
+            return obj;
+        });
+        return {header, rows};
+    }
+
+    function parseCSVtoData(obj){
+        const rows = obj.rows;
+        // Dibuat lebih dinamis untuk menangani semua kolom di header
+        const data = {};
+        obj.header.forEach(h => data[h] = []);
+        
+        rows.forEach(r => {
+            obj.header.forEach(h => {
+                const value = r[h] || '';
+                // Kolom 'month' atau 'date' tetap string, lainnya jadi angka
+                if (h.toLowerCase() === 'month' || h.toLowerCase() === 'date') {
+                    data[h].push(value);
+                } else {
+                    data[h].push(Number(value) || 0);
+                }
+            });
+        });
+        // Rename kolom agar konsisten
+        if(data.rain_mm) { data.rain = data.rain_mm; delete data.rain_mm; }
+        if(data.temp_mean) { data.temp = data.temp_mean; delete data.temp_mean; }
+        if(data.humidity) { data.humidity = data.humidity; }
+        if(data.fogging_events) { data.fogging = data.fogging_events; delete data.fogging_events; }
+        return data;
+    }
+
+    // OLS & Metrics (sama, tidak ada perubahan)
+    function olsFit(X, y){ const n=X.length; if(n===0)return null; const m=X[0].length; const XtX=Array.from({length:m},()=>Array(m).fill(0)); const XtY=Array(m).fill(0); for(let i=0;i<n;i++){ for(let a=0;a<m;a++){ for(let b=0;b<m;b++)XtX[a][b]+=X[i][a]*X[i][b]; XtY[a]+=X[i][a]*y[i]; } } const A=XtX.map((row,i)=>row.concat([XtY[i]])); const M=m; for(let k=0;k<M;k++){ let iMax=k; for(let i=k+1;i<M;i++)if(Math.abs(A[i][k])>Math.abs(A[iMax][k]))iMax=i; if(A[iMax][k]===0)continue; [A[k],A[iMax]]=[A[iMax],A[k]]; const pivot=A[k][k]; for(let j=k;j<=M;j++)A[k][j]/=pivot; for(let i=0;i<M;i++)if(i!==k){ const f=A[i][k]; for(let j=k;j<=M;j++)A[i][j]-=f*A[k][j]; } } const beta=Array(M).fill(0); for(let i=0;i<M;i++)beta[i]=A[i][M]; return beta; }
+    function predictWithBeta(X, beta){ return X.map(row=> row.reduce((s,v,i)=>s+v*beta[i],0)); }
+    function MAE(a,b){ const n=a.length; let s=0; for(let i=0;i<n;i++) s+=Math.abs(a[i]-b[i]); return s/n; }
+    function RMSE(a,b){ const n=a.length; let s=0; for(let i=0;i<n;i++){ const d=a[i]-b[i]; s+=d*d; } return Math.sqrt(s/n); }
+    let dataStore = null; let lastFit = null; let chartMain=null, chartRes=null;
+
+    // Pastikan Chart.js menggunakan font keluarga yang sama dan bukan italic
+    if(window.Chart){
+      Chart.defaults.font.family = "'Poppins', sans-serif";
+      Chart.defaults.font.size = 13;
+      // Chart.js may not have a direct defaults.font.style in older builds, but set if available
+      try{ Chart.defaults.font.style = 'normal'; }catch(e){}
+      if(Chart.defaults.plugins && Chart.defaults.plugins.title && Chart.defaults.plugins.title.font){
+        Chart.defaults.plugins.title.font.style = 'normal';
+      }
+      // soften default grid color to reduce visual noise
+      if(Chart.defaults.scales && Chart.defaults.scales.linear && Chart.defaults.scales.linear.grid){
+        Chart.defaults.scales.linear.grid.color = '#f3f5f7';
+      }
+    }
+
+    // ====== PERUBAHAN JAVASCRIPT DIMULAI DI SINI ======
+    
+  // Fungsi baru untuk mendapatkan variabel eksogen yang dipilih
+  // Gunakan mapping dari ID checkbox ke nama kolom data agar tidak perlu menambahkan atribut value di HTML
+  function getSelectedExogVars() {
+    const idToKey = {
+      chk_rain: 'rain',
+      chk_temp: 'temp',
+      chk_hum: 'humidity',
+      chk_fog: 'fogging',
+      chk_pop: 'pop_density'
+    };
+    const selected = [];
+    document.querySelectorAll('#exog-vars-selector input[type=checkbox]:checked').forEach(chk => {
+      const key = idToKey[chk.id] || chk.value || '';
+      if(key) selected.push(key);
+    });
+    return selected;
+  }
+
+    // buildFeatures dimodifikasi menjadi dinamis
+    function buildFeatures(ds, p, exogVars) {
+        const n = ds.cases.length;
+        const X = [];
+        const y = [];
+        const featureNames = ['intercept'];
+
+        for(let t = p; t < n; t++) {
+            const row = [];
+            row.push(1); // intercept
+            
+            // Lags (autoregressive part)
+            for(let lag = 1; lag <= p; lag++) {
+                row.push(ds.cases[t - lag]);
+                if (t === p) featureNames.push(`lag_${lag}`); // Hanya tambah nama sekali
+            }
+            
+            // Exogenous variables (dinamis)
+            exogVars.forEach(varName => {
+                row.push(ds[varName][t] || 0);
+                if (t === p) featureNames.push(varName); // Hanya tambah nama sekali
+            });
+            
+            X.push(row);
+            y.push(ds.cases[t]);
+        }
+        return { X, y, featureNames };
+    }
+
+    function transform(y, op){ if(op==='log1p') return y.map(v=>Math.log(v+1)); return y.slice(); }
+    function itransform(y, op){ if(op==='log1p') return y.map(v=>Math.exp(v)-1); return y.slice(); }
+
+    document.getElementById('btnParse').addEventListener('click', ()=>{
+        const txt = document.getElementById('csvdata').value;
+        if(!txt.trim()){ alert('Silakan tempel data CSV historis terlebih dahulu.'); return; }
+        const parsed = csvToRows(txt);
+        if(!parsed || !parsed.rows || parsed.rows.length < 12) {
+            alert('Data tidak valid atau kurang dari 12 baris. Silakan periksa kembali format CSV Anda.');
+            return;
+        }
+        dataStore = parseCSVtoData(parsed);
+
+        // Langsung jalankan proses forecast
+        runForecast();
+    });
+
+    function runForecast() { // Fungsi utama dipisah agar bisa dipanggil ulang
+        if(!dataStore){ alert('Data historis belum di-load.'); return; }
+        const model = document.getElementById('modelSelect').value;
+        const p = Number(document.getElementById('p_lags').value)||1;
+        const transformOp = document.getElementById('transform').value;
+        const horizon = Number(document.getElementById('horizon').value)||12;
+        const selectedExog = getSelectedExogVars(); // Dapatkan variabel terpilih
+
+        function parseFuture(id, defaultVal){
+            const txt = document.getElementById(id).value;
+            if(!txt.trim()) return Array(horizon).fill(defaultVal);
+            return txt.split(',').map(s=>Number(s.trim())||0).slice(0,horizon);
+        }
+
+        const futureExog = {
+            rain: parseFuture('rain_future', average(dataStore.rain)),
+            temp: parseFuture('temp_future', average(dataStore.temp)),
+            humidity: parseFuture('hum_future', average(dataStore.humidity)),
+            fogging: parseFuture('fog_future', 0),
+            pop_density: parseFuture('pop_future', dataStore.pop_density[dataStore.pop_density.length - 1] || 0)
+        };
+
+        if(model==='seasonal_naive'){
+            // ... (logika seasonal naive sama) ...
+            return;
+        }
+
+        const dsTrans = { ...dataStore, cases: transform(dataStore.cases, transformOp) };
+        const { X, y, featureNames } = buildFeatures(dsTrans, p, selectedExog);
+
+        if(X.length < p + 2){ alert('Tidak cukup titik data untuk melatih model dengan lag p=' + p); return; }
+        
+        const beta = olsFit(X, y);
+        if(!beta) { alert('Gagal melatih model. Periksa data input.'); return; }
+        
+        const fitted = predictWithBeta(X, beta);
+        const residuals = y.map((v,i)=>v - fitted[i]);
+        const residStd = Math.sqrt(residuals.reduce((s,v)=>s+v*v,0)/Math.max(1,residuals.length-1));
+
+        const historyY = dsTrans.cases.slice();
+        const forecastT = [];
+        for(let h = 0; h < horizon; h++) {
+            const row = [1]; // intercept
+            for(let lag=1; lag<=p; lag++) {
+                row.push(historyY[historyY.length - lag] || 0);
+            }
+            // Exog masa depan (dinamis)
+            selectedExog.forEach(varName => {
+                row.push(futureExog[varName][h] || 0);
+            });
+            
+            const yhat = row.reduce((s,v,i) => s + v * (beta[i]||0), 0);
+            forecastT.push(yhat);
+            historyY.push(yhat);
+        }
+
+        const forecast = itransform(forecastT, transformOp).map(v => Math.max(0, v));
+        const ciUpper = forecastT.map(t=> itransform([t + 1.96*residStd], transformOp)[0]).map(v => Math.max(0, v));
+        const ciLower = forecastT.map(t=> itransform([t - 1.96*residStd], transformOp)[0]).map(v => Math.max(0, v));
+
+        lastFit = {beta, residuals, residStd, transformOp, p, featureNames};
+
+        const backtestN = Math.min(3, y.length-1);
+        const backY = y.slice(-backtestN).map(v=> itransform([v], transformOp)[0]);
+        const backPred = fitted.slice(-backtestN).map(v=> itransform([v], transformOp)[0]);
+        const mae = MAE(backY, backPred).toFixed(2);
+        const rmse = RMSE(backY, backPred).toFixed(2);
+
+        renderForecast(forecast, dataStore, {upper:ciUpper, lower:ciLower}, 'ARIMAX-like (OLS)');
+        renderResiduals(residuals.map(r=>r));
+        // Populate prediction table and total
+        try{
+          const lastMonthStr = dataStore.month[dataStore.month.length-1];
+          const lastMonthDate = new Date(lastMonthStr+"-01T00:00:00");
+          const futureLabels = [];
+          for(let i=1;i<=forecast.length;i++){ const d=new Date(lastMonthDate); d.setMonth(lastMonthDate.getMonth()+i); futureLabels.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); }
+          populatePredictionTable(forecast, futureLabels);
+        }catch(e){ console.warn('Gagal mengisi tabel prediksi:', e); }
+
+        document.getElementById('metrics').innerText = `MAE: ${mae}\nRMSE: ${rmse}\nStd Residual (transf): ${residStd.toFixed(3)}`;
+        
+        function populatePredictionTable(forecast, labels){
+  const tbody = document.querySelector('#predTable tbody');
+  tbody.innerHTML = '';
+
+  // Jika belum ada data, tampilkan setingan awal
+  if (!forecast || forecast.length === 0) {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>-</td><td class="number">0</td>`;
+    tbody.appendChild(row);
+    document.getElementById('estTotal').innerText = 'Estimasi Total Kasus: 0';
+    document.getElementById('riskLevel').innerHTML = '🟢 Risiko Rendah';
+    document.getElementById('riskLevel').style.color = '#16a34a';
+    return;
+  }
+
+  // Isi tabel prediksi
+  forecast.forEach((val, i)=>{
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${labels[i]}</td><td class="number">${Math.round(val)}</td>`;
+    tbody.appendChild(row);
+  });
+
+  // Hitung total & rata-rata (dibulatkan)
+  const total = Math.round(forecast.reduce((a,b)=>a+b,0));
+  const avg = Math.round(total / forecast.length);
+  document.getElementById('estTotal').innerText = `Estimasi Total Kasus: ${total}`;
+
+  // Tentukan level risiko
+  let riskLabel = '';
+  let riskColor = '';
+  if (avg < 10) {
+    riskLabel = '🟢 Risiko Rendah';
+    riskColor = '#16a34a';
+  } else if (avg < 25) {
+    riskLabel = '🟡 Risiko Sedang';
+    riskColor = '#facc15';
+  } else {
+    riskLabel = '🔴 Risiko Tinggi';
+    riskColor = '#dc2626';
+  }
+
+  // Tampilkan hasil risiko
+  const riskEl = document.getElementById('riskLevel');
+  riskEl.innerHTML = riskLabel;
+  riskEl.style.color = riskColor;
+}
+
+        // Tampilkan ringkasan model yang lebih informatif
+        let summary = `Model OLS dengan variabel:\n`;
+        featureNames.forEach((name, i) => {
+            summary += `- ${name}: ${beta[i].toFixed(4)}\n`;
+        });
+        document.getElementById('summaryText').innerText = summary;
+    }
+    
+    // Fungsi untuk men-disable/enable input berdasarkan checkbox
+    function setupCheckboxListeners() {
+        const varMap = {
+            chk_rain: 'rain_future',
+            chk_temp: 'temp_future',
+            chk_hum: 'hum_future',
+            chk_fog: 'fog_future',
+            chk_pop: 'pop_future'
+        };
+        Object.keys(varMap).forEach(chkId => {
+            const chk = document.getElementById(chkId);
+            const input = document.getElementById(varMap[chkId]);
+            if (chk && input) {
+                chk.addEventListener('change', () => {
+                    input.disabled = !chk.checked;
+                    if(dataStore) runForecast(); // Otomatis update prediksi saat checkbox diubah
+                });
+                input.disabled = !chk.checked; // Set status awal
+            }
+        });
+    }
+    
+    // ====== PERUBAHAN JAVASCRIPT SELESAI DI SINI ======
+    
+    function average(arr){ if(!arr || arr.length===0) return 0; return arr.reduce((s,v)=>s+v,0)/arr.length; }
+    // Fungsi renderForecast & renderResiduals (sama, tidak ada perubahan)
+    function renderForecast(forecast, ds, ci, title){
+      const lastMonthStr = ds.month[ds.month.length-1];
+      const lastMonthDate = new Date(lastMonthStr + "-01T00:00:00");
+      const futureLabels = [];
+      for(let i=1;i<=forecast.length;i++){
+        const nextDate = new Date(lastMonthDate);
+        nextDate.setMonth(lastMonthDate.getMonth()+i);
+        futureLabels.push(`${nextDate.getFullYear()}-${String(nextDate.getMonth()+1).padStart(2,'0')}`);
+      }
+
+      const ctx = document.getElementById('chartForecast').getContext('2d');
+      if(chartMain) chartMain.destroy();
+
+      // Improve point visibility on hover
+      if(Chart && Chart.defaults && Chart.defaults.elements && Chart.defaults.elements.point){
+        Chart.defaults.elements.point.radius = 3;
+        Chart.defaults.elements.point.hoverRadius = 7;
+        Chart.defaults.elements.point.hoverBorderWidth = 2;
+      }
+
+      const historical = {
+        label: 'Kasus Historis',
+        data: ds.cases,
+        borderColor: 'rgba(13, 110, 253, 1)',
+        backgroundColor: 'rgba(13, 110, 253, 0.06)',
+        tension: 0.25,
+        fill: true,
+        borderWidth: 3,
+        pointRadius: 4,
+        pointHoverRadius: 10,
+        pointHoverBackgroundColor: 'rgba(255,255,255,1)',
+        pointHoverBorderColor: 'rgba(13,110,253,1)',
+        pointHoverBorderWidth: 3
+      };
+
+      const preds = {
+        label: 'Prediksi',
+        data: Array(ds.cases.length-1).fill(null).concat([ds.cases[ds.cases.length-1]]).concat(forecast),
+        borderColor: 'rgba(220, 53, 69, 1)',
+        backgroundColor: 'rgba(220, 53, 69, 0.04)',
+        borderDash: [],
+        tension: 0.2,
+        fill: false,
+        borderWidth: 3.5,
+        pointRadius: 5,
+        pointStyle: 'circle',
+        pointHoverRadius: 12,
+        pointHoverBackgroundColor: 'rgba(255,255,255,1)',
+        pointHoverBorderColor: 'rgba(220,53,69,1)',
+        pointHoverBorderWidth: 3
+      };
+
+      const datasets = [historical, preds];
+      if(ci){
+        const ciUpper = Array(ds.cases.length).fill(null).concat(ci.upper);
+        const ciLower = Array(ds.cases.length).fill(null).concat(ci.lower);
+        datasets.push({
+          label: 'CI Upper',
+          data: ciUpper,
+          borderColor: 'rgba(255, 193, 7, 0.08)',
+          backgroundColor: 'rgba(255, 193, 7, 0.06)',
+          pointRadius: 0,
+          fill: '+1'
+        });
+        datasets.push({
+          label: 'CI Lower',
+          data: ciLower,
+          borderColor: 'transparent',
+          pointRadius: 0,
+          fill: false
+        });
+      }
+
+      chartMain = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ds.month.concat(futureLabels),
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          layout: { padding: { left: 6, right: 12, top: 6, bottom: 6 } },
+          interaction: { mode: 'nearest', intersect: false },
+          plugins: {
+            title: {
+              display: true,
+              text: title || 'Forecast',
+              font: { size: 20, weight: '700', style: 'normal', family: "'Poppins', sans-serif" },
+              padding: { top: 10, bottom: 6 }
+            },
+            legend: {
+              position: 'bottom',
+              labels: { boxWidth: 18, boxHeight: 10, font: { size: 13, style: 'normal', family: "'Poppins', sans-serif" }, padding: 12 }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              bodyFont: { size: 13, style: 'normal', family: "'Poppins', sans-serif" },
+              displayColors: true
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { font: { size: 14, style: 'normal', family: "'Poppins', sans-serif" }, maxRotation: 0, autoSkip: true },
+              title: { display: true, text: 'Bulan', font: { size: 14, style: 'normal', family: "'Poppins', sans-serif" } }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f3f6f8' },
+              ticks: { font: { size: 14, style: 'normal', family: "'Poppins', sans-serif" }, callback: function(val){ return Number(val).toLocaleString(); } },
+              title: { display: true, text: 'Jumlah Kasus', font: { size: 14, style: 'normal', family: "'Poppins', sans-serif" } }
+            }
+          }
+        }
+      });
+
+      // Debounced resize to keep chart stable when window resizes
+      if(window.__chartResizeDebounce) clearTimeout(window.__chartResizeDebounce);
+      window.__chartResizeDebounce = setTimeout(()=>{
+        try{ chartMain.resize(); }catch(e){}
+      }, 120);
+    }
+    function renderResiduals(resids){
+      // Jika tidak ada elemen canvas #chartRes maka lompat — ini mencegah error JS dan
+      // menjaga agar kita tidak menambahkan canvas baru secara otomatis (sesuai permintaan).
+      const canvas = document.getElementById('chartRes');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if(chartRes) chartRes.destroy();
+      chartRes = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: resids.map((_,i)=>`t-${resids.length-i}`),
+          datasets: [{ label: 'Residuals (transformed)', data: resids, backgroundColor: 'rgba(108, 117, 125, 0.6)' }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { y: { beginAtZero: false, grid: { color: '#e9ecef' } }, x: { grid: { display: false } } },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    // Populate the prediction table below the chart
+    function formatNumber(n){ return Number(n).toLocaleString(); }
+    // store last forecast for download/export
+    let __lastForecast = null; let __lastLabels = null;
+    function populatePredictionTable(forecastArr, labels){
+      __lastForecast = forecastArr.slice(); __lastLabels = labels.slice();
+      const tbody = document.querySelector('#predTable tbody');
+      if(!tbody) return;
+      tbody.innerHTML = '';
+      let total = 0;
+      for(let i=0;i<forecastArr.length;i++){
+        const tr = document.createElement('tr');
+        const td1 = document.createElement('td'); td1.innerText = labels[i] || `Bulan ${i+1}`;
+        const td2 = document.createElement('td'); td2.className = 'number'; td2.innerText = formatNumber(Math.round(forecastArr[i]));
+        tr.appendChild(td1); tr.appendChild(td2);
+        tbody.appendChild(tr);
+        total += Number(forecastArr[i]||0);
+      }
+      const totalEl = document.getElementById('estTotal');
+      if(totalEl) totalEl.innerText = `Estimasi Total Kasus: ${formatNumber(Math.round(total))} kasus`;
+    }
+
+    // Download helpers
+    async function downloadChartImage(){
+      const el = document.querySelector('.chart-wrapper');
+      if(!el) return alert('Chart tidak ditemukan');
+      try{
+        const canvas = await html2canvas(el, { backgroundColor: null, scale: 2 });
+        const url = canvas.toDataURL('image/png');
+        const a = document.createElement('a'); a.href = url; a.download = 'prediksi_grafik.png'; document.body.appendChild(a); a.click(); a.remove();
+      }catch(e){ console.error(e); alert('Gagal mengunduh gambar'); }
+    }
+
+    function downloadCSV(){
+      if(!__lastForecast || !__lastLabels) return alert('Tidak ada data prediksi untuk diunduh');
+      const rows = [['Bulan','Prediksi Kasus']];
+      for(let i=0;i<__lastForecast.length;i++) rows.push([__lastLabels[i]||`Bulan ${i+1}`, Math.round(__lastForecast[i])]);
+      const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='prediksi_kasus.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    async function downloadPDF(){
+      if(!__lastForecast) return alert('Tidak ada data prediksi untuk diunduh');
+      // render chart to image then put in PDF with table below
+      const el = document.querySelector('.chart-wrapper');
+      try{
+        const canvas = await html2canvas(el, { backgroundColor: null, scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape' });
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const imgProps = doc.getImageProperties(imgData);
+        const imgWidth = pageWidth - 20; const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+        doc.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        // add table starting below image
+        let startY = 10 + imgHeight + 6;
+        doc.setFontSize(12); doc.text('Tabel Prediksi Kasus', 14, startY + 6);
+        startY += 12;
+        doc.setFontSize(10);
+        const col1X = 14, col2X = 110;
+        doc.text('Bulan', col1X, startY);
+        doc.text('Prediksi Kasus', col2X, startY);
+        startY += 6;
+        for(let i=0;i<__lastForecast.length;i++){
+          doc.text(String(__lastLabels[i]||`Bulan ${i+1}`), col1X, startY + i*6);
+          doc.text(String(Math.round(__lastForecast[i])), col2X, startY + i*6);
+        }
+        doc.save('prediksi_kasus.pdf');
+      }catch(e){ console.error(e); alert('Gagal membuat PDF'); }
+    }
+
+    // Attach button handlers
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const bImg = document.getElementById('btnDownloadImage');
+      const bCSV = document.getElementById('btnDownloadCSV');
+      const bPDF = document.getElementById('btnDownloadPDF');
+      if(bImg) bImg.addEventListener('click', downloadChartImage);
+      if(bCSV) bCSV.addEventListener('click', downloadCSV);
+      if(bPDF) bPDF.addEventListener('click', downloadPDF);
+    });
+    
+    window.addEventListener('load', () => {
+      setupCheckboxListeners(); // Panggil fungsi listener checkbox
+      const csvText = document.querySelector('pre.code-block').innerText;
+      document.getElementById('csvdata').value = csvText;
+      document.getElementById('btnParse').click();
+    });
+
+    // Resize listener (debounced) to keep chart responsive/stable on viewport/orientation change
+    let __resizeTimer = null;
+    window.addEventListener('resize', ()=>{
+      if(__resizeTimer) clearTimeout(__resizeTimer);
+      __resizeTimer = setTimeout(()=>{
+        try{ if(chartMain) chartMain.resize(); if(chartRes) chartRes.resize(); }catch(e){}
+      }, 150);
+    });
+
+    
+  </script>
+</body>
+</html>

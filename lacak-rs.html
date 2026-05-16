@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pelacak Fasilitas Kesehatan Terdekat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-compass/dist/leaflet-compass.css">
+
+  <style>
+    :root {
+      --bg-soft: rgba(247, 251, 255, 0.92);
+      --panel-border: rgba(120, 158, 190, 0.18);
+      --panel-shadow: 0 18px 40px rgba(22, 58, 91, 0.18);
+      --text-main: #17324d;
+      --text-muted: #58708a;
+      --brand: #0e7ac7;
+      --brand-strong: #095e9b;
+      --accent: #14b37d;
+      --surface: rgba(255, 255, 255, 0.84);
+      --status-bg: #edf7ff;
+      --status-border: #c6e2f7;
+      --status-text: #125280;
+      --secondary-bg: #eef4f8;
+      --secondary-text: #25435f;
+      --danger: #d94f45;
+      --item-bg: #f7fbff;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    body {
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at top left, rgba(32, 126, 204, 0.12), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(20, 179, 125, 0.12), transparent 22%),
+        #eef4f8;
+    }
+
+    #map {
+      height: 100vh;
+      width: 100vw;
+      touch-action: pan-x pan-y;
+    }
+
+    .leaflet-control-zoom {
+      display: none;
+    }
+
+    #tombol {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      z-index: 999;
+      width: min(360px, calc(100vw - 36px));
+      max-height: calc(100vh - 36px);
+      overflow-y: auto;
+      box-sizing: border-box;
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid var(--panel-border);
+      background: var(--bg-soft);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--panel-shadow);
+      animation: panelEnter 0.35s ease;
+    }
+
+    #showPanelBtn {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      z-index: 998;
+      display: none;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 999px;
+      background: rgba(12, 74, 117, 0.92);
+      color: white;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 0 14px 24px rgba(10, 47, 73, 0.22);
+    }
+
+    .back-home {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-bottom: 14px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(14, 122, 199, 0.12), rgba(20, 179, 125, 0.14));
+      border: 1px solid rgba(14, 122, 199, 0.18);
+      color: var(--brand-strong);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      box-shadow: 0 10px 24px rgba(14, 94, 155, 0.08);
+    }
+
+    .back-home:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, rgba(14, 122, 199, 0.18), rgba(20, 179, 125, 0.2));
+    }
+
+    #headerLogo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    #headerLogo img {
+      width: 54px;
+      height: 54px;
+      object-fit: contain;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ffffff, #dceeff);
+      padding: 6px;
+      box-shadow: inset 0 0 0 1px rgba(112, 156, 191, 0.22);
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+      background: rgba(14, 122, 199, 0.1);
+      color: var(--brand-strong);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    #headerLogo h2 {
+      margin: 0;
+      color: var(--text-main);
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .status-card {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      background: var(--status-bg);
+      border: 1px solid var(--status-border);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(18, 82, 128, 0.1);
+      color: var(--status-text);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    #info {
+      margin: 0;
+      color: var(--status-text);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    #resultMeta {
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .panel-actions,
+    .panel-secondary {
+      display: grid;
+      gap: 10px;
+    }
+
+    .panel-secondary {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #lacakBtn,
+    #openTabBtn,
+    #modeBtn,
+    .tombol-panel,
+    .tombol-rute {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 13px 14px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+    }
+
+    #lacakBtn:hover,
+    #openTabBtn:hover,
+    #modeBtn:hover,
+    .tombol-panel:hover,
+    .tombol-rute:hover,
+    #lacakBtn:focus-visible,
+    #openTabBtn:focus-visible,
+    #modeBtn:focus-visible,
+    .tombol-panel:focus-visible,
+    .tombol-rute:focus-visible {
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    #lacakBtn {
+      background: linear-gradient(135deg, var(--brand), #2ea1e8);
+      color: white;
+      box-shadow: 0 14px 30px rgba(14, 122, 199, 0.25);
+    }
+
+    #lacakBtn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    #openTabBtn,
+    #modeBtn,
+    .tombol-panel {
+      background: var(--secondary-bg);
+      color: var(--secondary-text);
+      box-shadow: inset 0 0 0 1px rgba(100, 137, 168, 0.12);
+    }
+
+    .tombol-panel {
+      background: rgba(20, 179, 125, 0.14);
+      color: #0d6a4b;
+    }
+
+    #tampilkanPanelRuteBtn {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1000;
+      display: none;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 999px;
+      background: rgba(12, 74, 117, 0.94);
+      color: white;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 14px 28px rgba(10, 47, 73, 0.24);
+    }
+
+    #rumahSakitList {
+      display: none;
+      max-height: 280px;
+      overflow-y: auto;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(104, 139, 170, 0.16);
+    }
+
+    .list-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .list-heading h3 {
+      margin: 0;
+      color: var(--text-main);
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    #hasilCount {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(14, 122, 199, 0.1);
+      color: var(--brand-strong);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    #listItems {
+      display: grid;
+      gap: 10px;
+    }
+
+    .rumahSakitItem {
+      padding: 14px;
+      border-radius: 18px;
+      background: var(--item-bg);
+      border: 1px solid rgba(110, 149, 181, 0.15);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .rumahSakitItem:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 26px rgba(22, 58, 91, 0.08);
+      border-color: rgba(14, 122, 199, 0.22);
+    }
+
+    .rumahSakitNama {
+      margin-bottom: 8px;
+      color: var(--text-main);
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .rumahSakitMeta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .jarakBadge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(20, 179, 125, 0.12);
+      color: #0d6a4b;
+      font-weight: 700;
+    }
+
+    .tombol-rute {
+      background: linear-gradient(135deg, #0f87d8, #0b6bad);
+      color: white;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .status-card.is-loading {
+      background: #edf7ff;
+      border-color: #c6e2f7;
+    }
+
+    .status-card.is-success {
+      background: #ecfbf4;
+      border-color: #bfe8d1;
+    }
+
+    .status-card.is-success #info,
+    .status-card.is-success .status-pill {
+      color: #0d6a4b;
+    }
+
+    .status-card.is-success .status-pill {
+      background: rgba(20, 179, 125, 0.14);
+    }
+
+    .status-card.is-error {
+      background: #fff3f1;
+      border-color: #f4ccc7;
+    }
+
+    .status-card.is-error #info,
+    .status-card.is-error .status-pill {
+      color: #9d342d;
+    }
+
+    .status-card.is-error .status-pill {
+      background: rgba(217, 79, 69, 0.12);
+    }
+
+    .leaflet-routing-container {
+      border-radius: 18px;
+      box-shadow: 0 18px 34px rgba(22, 58, 91, 0.18);
+      overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+      #tombol {
+        top: auto;
+        left: 12px;
+        right: 12px;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        width: auto;
+        max-height: min(56vh, 520px);
+        padding: 16px;
+        border-radius: 24px;
+      }
+
+      #showPanelBtn {
+        top: auto;
+        left: 12px;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        padding: 11px 14px;
+        font-size: 12px;
+      }
+
+      #headerLogo {
+        align-items: flex-start;
+      }
+
+      #headerLogo h2 {
+        font-size: 19px;
+      }
+
+      .panel-secondary {
+        grid-template-columns: 1fr;
+      }
+
+      #rumahSakitList {
+        max-height: 180px;
+      }
+
+      #tampilkanPanelRuteBtn {
+        right: 12px;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      }
+
+      .leaflet-routing-container {
+        max-width: calc(100vw - 24px);
+        margin: 0 12px 12px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      #tombol {
+        scrollbar-width: thin;
+      }
+
+      #tombol::-webkit-scrollbar,
+      #rumahSakitList::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      #tombol::-webkit-scrollbar-thumb,
+      #rumahSakitList::-webkit-scrollbar-thumb {
+        background: rgba(88, 112, 138, 0.28);
+        border-radius: 999px;
+      }
+    }
+
+    body.dark-mode {
+      --bg-soft: rgba(15, 29, 44, 0.9);
+      --panel-border: rgba(126, 164, 198, 0.16);
+      --panel-shadow: 0 22px 42px rgba(0, 0, 0, 0.32);
+      --text-main: #e8f3fb;
+      --text-muted: #a9bfd0;
+      --brand: #56b4ff;
+      --brand-strong: #8ad0ff;
+      --surface: rgba(23, 40, 58, 0.86);
+      --status-bg: rgba(16, 51, 78, 0.86);
+      --status-border: rgba(96, 161, 209, 0.22);
+      --status-text: #d5ecff;
+      --secondary-bg: rgba(255, 255, 255, 0.08);
+      --secondary-text: #eef7ff;
+      --item-bg: rgba(255, 255, 255, 0.06);
+      background:
+        radial-gradient(circle at top left, rgba(86, 180, 255, 0.16), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(20, 179, 125, 0.14), transparent 20%),
+        #0d1722;
+    }
+
+    body.dark-mode .status-card.is-success {
+      background: rgba(11, 77, 58, 0.82);
+      border-color: rgba(78, 166, 133, 0.3);
+    }
+
+    body.dark-mode .status-card.is-error {
+      background: rgba(101, 36, 31, 0.82);
+      border-color: rgba(212, 115, 104, 0.3);
+    }
+
+    @keyframes panelEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="tombol">
+    <a class="back-home" href="index.html">Kembali ke Beranda</a>
+    <div id="headerLogo">
+      <img src="LOGO E-DEBR.png" alt="Logo">
+      <div class="brand-copy">
+        <div class="eyebrow">E-DEBAR</div>
+        <h2>Pelacak RS & Puskesmas Terdekat</h2>
+        <p class="subtitle">Temukan rumah sakit dan puskesmas terdekat dari lokasi Anda dengan tampilan cepat, ringkas, dan nyaman dipakai di handphone.</p>
+      </div>
+    </div>
+
+    <div id="statusCard" class="status-card">
+      <span id="statusPill" class="status-pill">Siap</span>
+      <p id="info">Klik tombol untuk mulai melacak rumah sakit dan puskesmas terdekat.</p>
+      <div id="resultMeta">Lokasi dipakai untuk menampilkan hasil terdekat di peta ini.</div>
+    </div>
+
+    <div class="panel-actions">
+      <button id="lacakBtn" onclick="mulaiPelacakan()">Mulai Pelacakan Lokasi</button>
+    </div>
+
+    <div class="panel-secondary">
+      <button id="openTabBtn" onclick="bukaTabBaru()" style="display:none;">Buka di Laman Baru</button>
+      <button id="modeBtn" onclick="toggleMode()">Mode Gelap</button>
+      <button class="tombol-panel" onclick="togglePanel()">Sembunyikan Panel</button>
+    </div>
+
+    <div id="rumahSakitList">
+      <div class="list-heading">
+        <h3>Daftar Fasilitas Terdekat</h3>
+        <span id="hasilCount">0</span>
+      </div>
+      <div id="listItems"></div>
+    </div>
+  </div>
+
+  <button id="showPanelBtn" onclick="tampilkanPanel()">Tampilkan Panel</button>
+  <button id="tampilkanPanelRuteBtn">Tampilkan Panel Rute</button>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+  <script src="https://unpkg.com/leaflet-compass/dist/leaflet-compass.min.js"></script>
+
+  <script>
+    const map = L.map('map', { zoomControl: false }).setView([-2.5, 118], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    const compass = new L.Control.Compass({ autoActive: true, showDigit: true });
+    map.addControl(compass);
+
+    let markerPengguna = null;
+    let routing = null;
+    let lokasiSebelumnya = null;
+    let lokasiPengguna = null;
+    let sudahDiSetView = false;
+    let rumahSakitData = [];
+    let markerRumahSakit = [];
+    let sedangMencari = false;
+    const searchRadius = 25000;
+
+    function setInfo(message, state = "loading", meta = "") {
+      const infoEl = document.getElementById('info');
+      const metaEl = document.getElementById('resultMeta');
+      const statusCard = document.getElementById('statusCard');
+      const statusPill = document.getElementById('statusPill');
+      const statusMap = {
+        idle: "Siap",
+        loading: "Mencari",
+        success: "Ditemukan",
+        error: "Gagal"
+      };
+
+      infoEl.textContent = message;
+      metaEl.textContent = meta;
+      statusPill.textContent = statusMap[state] || "Info";
+
+      statusCard.classList.remove('is-loading', 'is-success', 'is-error');
+      if (state === "loading") statusCard.classList.add('is-loading');
+      if (state === "success") statusCard.classList.add('is-success');
+      if (state === "error") statusCard.classList.add('is-error');
+    }
+
+    function updateHasilCount(total) {
+      document.getElementById('hasilCount').textContent = total;
+    }
+
+    if (window !== window.parent) {
+      setInfo(
+        "Pelacakan lokasi tidak tersedia di mode embed. Silakan buka di tab baru.",
+        "error",
+        "Mode embed membatasi akses lokasi browser."
+      );
+      document.getElementById('lacakBtn').disabled = true;
+      document.getElementById('openTabBtn').style.display = "block";
+    }
+
+    function bukaTabBaru() {
+      window.open(window.location.href, '_blank');
+    }
+
+    function toggleMode() {
+      document.body.classList.toggle('dark-mode');
+      document.getElementById('modeBtn').textContent = document.body.classList.contains('dark-mode')
+        ? 'Mode Terang'
+        : 'Mode Gelap';
+    }
+
+    function togglePanel() {
+      const panel = document.getElementById('tombol');
+      const showBtn = document.getElementById('showPanelBtn');
+
+      panel.style.display = 'none';
+      showBtn.style.display = 'block';
+    }
+
+    function tampilkanPanel() {
+      const panel = document.getElementById('tombol');
+      const showBtn = document.getElementById('showPanelBtn');
+
+      panel.style.display = 'block';
+      showBtn.style.display = 'none';
+    }
+
+    function mulaiPelacakan() {
+      if (!navigator.geolocation) {
+        alert("Browser tidak mendukung geolokasi.");
+        return;
+      }
+
+      if (sedangMencari) {
+        return;
+      }
+
+      sedangMencari = true;
+      document.getElementById('lacakBtn').disabled = true;
+
+      setInfo(
+        "Sedang mengaktifkan lokasi Anda...",
+        "loading",
+        "Pastikan izin lokasi di browser sudah diizinkan."
+      );
+
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const accuracy = Number(pos.coords.accuracy || 0);
+        lokasiPengguna = { lat, lon };
+        lokasiSebelumnya = { lat, lon };
+
+        if (markerPengguna) map.removeLayer(markerPengguna);
+
+        markerPengguna = L.marker([lat, lon]).addTo(map)
+          .bindPopup("Lokasi Anda")
+          .openPopup();
+
+        if (!sudahDiSetView) {
+          map.setView([lat, lon], 14);
+          sudahDiSetView = true;
+        }
+
+        setInfo(
+          "Mencari fasilitas kesehatan terdekat...",
+          "loading",
+          `Akurasi lokasi sekitar ${Math.round(accuracy)} meter. Pencarian rumah sakit dan puskesmas dilakukan dalam radius 25 km.`
+        );
+        cariRumahSakit(lat, lon);
+      }, err => {
+        setInfo(
+          "Gagal mendapatkan lokasi Anda.",
+          "error",
+          err.message
+        );
+        sedangMencari = false;
+        document.getElementById('lacakBtn').disabled = false;
+      }, {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 12000
+      });
+    }
+
+    async function cariRumahSakit(lat, lon) {
+      try {
+        const hasilMentah = await cariRumahSakitJsonp(lat, lon);
+        const validElements = normalisasiHasilRumahSakit(hasilMentah, lat, lon);
+
+        if (!validElements.length) {
+          resetDaftarRumahSakit();
+          tampilkanFallbackPencarian(lat, lon);
+          setInfo(
+            "Belum ada data fasilitas kesehatan yang berhasil dimuat.",
+            "error",
+            "Pencarian otomatis belum menemukan hasil. Gunakan tombol cadangan bila diperlukan."
+          );
+          return;
+        }
+
+        const deduped = new Map();
+        validElements.forEach(rumahSakit => {
+          const key = `${rumahSakit.nama}-${rumahSakit.jenis}-${rumahSakit.lat.toFixed(5)}-${rumahSakit.lon.toFixed(5)}`;
+          if (!deduped.has(key)) {
+            deduped.set(key, rumahSakit);
+          }
+        });
+
+        rumahSakitData = Array.from(deduped.values()).sort((a, b) => a.jarak - b.jarak);
+        const rumahSakitTerdekat = rumahSakitData[0] || null;
+
+        if (!rumahSakitTerdekat) {
+          resetDaftarRumahSakit();
+          setInfo(
+            "Data fasilitas kesehatan ditemukan, tetapi belum bisa diproses.",
+            "error",
+            "Silakan coba lagi sebentar lagi."
+          );
+          return;
+        }
+
+        setInfo(
+          `Terdekat: ${rumahSakitTerdekat.nama} - ${rumahSakitTerdekat.jenis} (${rumahSakitTerdekat.jarak.toFixed(2)} km)`,
+          "success",
+          `${rumahSakitData.length} hasil ditemukan dalam radius ${searchRadius / 1000} km.`
+        );
+
+        tampilkanDaftarRumahSakit();
+        tampilkanMarkerRumahSakit();
+      } catch (err) {
+        console.error(err);
+        resetDaftarRumahSakit();
+        tampilkanFallbackPencarian(lat, lon);
+        setInfo(
+          "Gagal memuat data fasilitas kesehatan.",
+          "error",
+          "Pencarian online sedang lambat atau diblokir browser. Gunakan tombol pencarian cadangan yang ditampilkan di panel."
+        );
+      } finally {
+        sedangMencari = false;
+        document.getElementById('lacakBtn').disabled = false;
+      }
+    }
+
+    async function cariRumahSakitJsonp(lat, lon) {
+      const deltaLat = 0.22;
+      const deltaLon = 0.22;
+      const viewbox = [
+        (lon - deltaLon).toFixed(6),
+        (lat + deltaLat).toFixed(6),
+        (lon + deltaLon).toFixed(6),
+        (lat - deltaLat).toFixed(6)
+      ].join(',');
+
+      const hasilHospital = await fetchJsonp(
+        bangunUrlNominatim("rumah sakit", viewbox, 20),
+        8000
+      );
+
+      const hasilRs = await fetchJsonp(
+        bangunUrlNominatim("rs", viewbox, 20),
+        8000
+      );
+
+      const hasilPuskesmas = await fetchJsonp(
+        bangunUrlNominatim("puskesmas", viewbox, 20),
+        8000
+      );
+
+      return [...hasilHospital, ...hasilRs, ...hasilPuskesmas];
+    }
+
+    function bangunUrlNominatim(keyword, viewbox, limit) {
+      const params = new URLSearchParams({
+        q: keyword,
+        format: "jsonv2",
+        limit: String(limit),
+        bounded: "1",
+        viewbox,
+        addressdetails: "1",
+        countrycodes: "id"
+      });
+
+      return `https://nominatim.openstreetmap.org/search?${params.toString()}`;
+    }
+
+    function fetchJsonp(url, timeoutMs) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `jsonpCallback_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+        const script = document.createElement('script');
+        const timeoutId = setTimeout(() => {
+          cleanup();
+          reject(new Error("Permintaan JSONP melewati batas waktu."));
+        }, timeoutMs);
+
+        function cleanup() {
+          clearTimeout(timeoutId);
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+          delete window[callbackName];
+        }
+
+        window[callbackName] = (data) => {
+          cleanup();
+          resolve(Array.isArray(data) ? data : []);
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("Gagal memuat data JSONP."));
+        };
+
+        script.src = `${url}&json_callback=${callbackName}`;
+        document.body.appendChild(script);
+      });
+    }
+
+    function normalisasiHasilRumahSakit(data, lat, lon) {
+      return data
+        .map(item => {
+          const latRS = Number(item.lat);
+          const lonRS = Number(item.lon);
+          const nama = item.display_name
+            ? item.display_name.split(',')[0].trim()
+            : "Rumah Sakit";
+          const namaLower = nama.toLowerCase();
+          const alamat = item.display_name || "Alamat tidak tersedia";
+          const alamatLower = alamat.toLowerCase();
+
+          if (!Number.isFinite(latRS) || !Number.isFinite(lonRS)) {
+            return null;
+          }
+
+          const isPuskesmas = namaLower.includes("puskesmas") || alamatLower.includes("puskesmas");
+          const isHospitalName =
+            namaLower.includes("rumah sakit") ||
+            namaLower.startsWith("rs ") ||
+            namaLower.startsWith("rsu ") ||
+            namaLower.startsWith("rsud ") ||
+            namaLower.startsWith("rsa ") ||
+            namaLower.startsWith("rsi ") ||
+            namaLower.startsWith("rumkit");
+
+          if (!isPuskesmas && !isHospitalName) {
+            return null;
+          }
+
+          const jarak = hitungJarak(lat, lon, latRS, lonRS);
+          const jenis = isPuskesmas ? "Puskesmas" : "Rumah Sakit";
+
+          return {
+            lat: latRS,
+            lon: lonRS,
+            nama,
+            jarak,
+            alamat,
+            jenis
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.jarak - b.jarak);
+    }
+
+    function resetDaftarRumahSakit() {
+      rumahSakitData = [];
+      updateHasilCount(0);
+      document.getElementById('listItems').innerHTML = '';
+      document.getElementById('rumahSakitList').style.display = 'none';
+      hapusMarkerRumahSakit();
+    }
+
+    function tampilkanFallbackPencarian(lat, lon) {
+      const listContainer = document.getElementById('listItems');
+      const googleMapsUrl = `https://www.google.com/maps/search/rumah+sakit+atau+puskesmas/@${lat},${lon},14z`;
+
+      listContainer.innerHTML = `
+        <div class="rumahSakitItem">
+          <div class="rumahSakitNama">Pencarian Cadangan</div>
+          <div class="rumahSakitMeta">
+            <span>Data otomatis belum tersedia</span>
+            <span class="jarakBadge">Manual</span>
+          </div>
+          <button class="tombol-rute" onclick="window.open('${googleMapsUrl}', '_blank')">Cari di Google Maps</button>
+        </div>
+      `;
+
+      updateHasilCount(1);
+      document.getElementById('rumahSakitList').style.display = 'block';
+    }
+
+    function tampilkanDaftarRumahSakit() {
+      const listContainer = document.getElementById('listItems');
+      listContainer.innerHTML = '';
+
+      rumahSakitData.forEach(rumahSakit => {
+        const div = document.createElement('div');
+        div.classList.add('rumahSakitItem');
+        div.innerHTML = `
+          <div class="rumahSakitNama">${rumahSakit.nama}</div>
+          <div class="subtitle" style="margin: 0 0 8px; font-size: 12px; color: var(--brand-strong); font-weight: 700;">${rumahSakit.jenis}</div>
+          <div class="subtitle" style="margin: 0 0 10px; font-size: 12px;">${rumahSakit.alamat || "Alamat tidak tersedia"}</div>
+          <div class="rumahSakitMeta">
+            <span>Rute tersedia di peta</span>
+            <span class="jarakBadge">${rumahSakit.jarak.toFixed(2)} km</span>
+          </div>
+          <button class="tombol-rute" onclick="lihatRuteRumahSakit(${rumahSakit.lat}, ${rumahSakit.lon})">Lihat Rute</button>
+        `;
+        listContainer.appendChild(div);
+      });
+
+      updateHasilCount(rumahSakitData.length);
+      document.getElementById('rumahSakitList').style.display = 'block';
+    }
+
+    function lihatRuteRumahSakit(latRS, lonRS) {
+      if (!lokasiPengguna) {
+        setInfo(
+          "Lokasi Anda belum tersedia.",
+          "error",
+          "Aktifkan pelacakan lokasi terlebih dahulu untuk melihat rute."
+        );
+        return;
+      }
+
+      tampilkanRute(lokasiPengguna.lat, lokasiPengguna.lon, latRS, lonRS);
+    }
+
+    function hapusMarkerRumahSakit() {
+      markerRumahSakit.forEach(marker => map.removeLayer(marker));
+      markerRumahSakit = [];
+    }
+
+    function tampilkanMarkerRumahSakit() {
+      hapusMarkerRumahSakit();
+
+      rumahSakitData.forEach(rumahSakit => {
+        const marker = L.marker([rumahSakit.lat, rumahSakit.lon])
+          .addTo(map)
+          .bindPopup(`${rumahSakit.nama}<br>${rumahSakit.jarak.toFixed(2)} km`);
+
+        markerRumahSakit.push(marker);
+      });
+    }
+
+    function tampilkanRute(lat1, lon1, lat2, lon2) {
+      if (routing) map.removeControl(routing);
+
+      routing = L.Routing.control({
+        waypoints: [
+          L.latLng(lat1, lon1),
+          L.latLng(lat2, lon2)
+        ],
+        routeWhileDragging: false,
+        draggableWaypoints: false,
+        createMarker: () => null
+      }).addTo(map);
+
+      routing.on('routeselected', function () {
+        setTimeout(() => {
+          const container = document.querySelector('.leaflet-routing-container');
+          const toggleBtn = document.getElementById('tampilkanPanelRuteBtn');
+
+          if (container && !document.getElementById('kecilkanPanelRute')) {
+            const btn = document.createElement('button');
+            btn.id = 'kecilkanPanelRute';
+            btn.textContent = 'x';
+            btn.title = 'Kecilkan Panel Rute';
+            btn.style.position = 'absolute';
+            btn.style.top = '6px';
+            btn.style.right = '8px';
+            btn.style.background = '#d94f45';
+            btn.style.color = 'white';
+            btn.style.border = 'none';
+            btn.style.borderRadius = '8px';
+            btn.style.cursor = 'pointer';
+            btn.style.padding = '4px 8px';
+            btn.style.fontSize = '14px';
+            btn.style.fontWeight = '700';
+
+            btn.onclick = () => {
+              container.style.display = 'none';
+              toggleBtn.style.display = 'block';
+            };
+
+            container.style.position = 'relative';
+            container.appendChild(btn);
+          }
+
+          if (container) {
+            container.style.display = 'block';
+          }
+
+          if (toggleBtn) {
+            toggleBtn.style.display = 'none';
+          }
+        }, 300);
+      });
+    }
+
+    function hitungJarak(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    document.getElementById('tampilkanPanelRuteBtn').addEventListener('click', () => {
+      const container = document.querySelector('.leaflet-routing-container');
+      if (container) {
+        container.style.display = 'block';
+        document.getElementById('tampilkanPanelRuteBtn').style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

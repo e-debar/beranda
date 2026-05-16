@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnosis Obat DBD - E-DEBAR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #06da38;
+      --primary-dark: #06972a;
+      --secondary: #e8fff0;
+      --danger: #d64545;
+      --warning: #f39c12;
+      --info: #1479c9;
+      --text: #1b2a1f;
+      --muted: #617267;
+      --card: rgba(255, 255, 255, 0.94);
+      --border: rgba(6, 218, 56, 0.18);
+      --shadow: 0 20px 45px rgba(21, 78, 37, 0.12);
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(6, 218, 56, 0.15), transparent 28%),
+        radial-gradient(circle at top right, rgba(20, 121, 201, 0.12), transparent 28%),
+        linear-gradient(180deg, #f7fff9 0%, #eef8ff 100%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .reference-card a {
+      color: var(--info);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .title-icon,
+    .inline-icon,
+    .mini-icon {
+      color: var(--primary-dark);
+    }
+
+    .title-icon {
+      margin-right: 10px;
+    }
+
+    .inline-icon {
+      margin-right: 8px;
+    }
+
+    .mini-icon {
+      margin-right: 6px;
+      color: var(--info);
+    }
+
+    .page-shell {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+    }
+
+    .brand img {
+      width: 54px;
+      height: 54px;
+      object-fit: cover;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(6, 218, 56, 0.18);
+    }
+
+    .back-link {
+      background: #fff;
+      border: 1px solid rgba(20, 121, 201, 0.14);
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      color: var(--info);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .hero-card,
+    .panel,
+    .result-card,
+    .reference-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+    }
+
+    .hero-card {
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -60px auto;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(6, 218, 56, 0.18), transparent 66%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--secondary);
+      color: var(--primary-dark);
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    h1 {
+      margin: 18px 0 14px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.08;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    .hero-card p {
+      margin: 0;
+      max-width: 720px;
+      color: #395045;
+      font-size: 1.03rem;
+      line-height: 1.8;
+    }
+
+    .hero-points {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .hero-point {
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.72);
+      border-radius: 18px;
+      border: 1px solid rgba(6, 218, 56, 0.12);
+    }
+
+    .hero-point strong {
+      display: block;
+      margin-bottom: 6px;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    .hero-point span {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .warning-card {
+      padding: 28px;
+      background: linear-gradient(180deg, #103723 0%, #0b4d27 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .warning-card h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    .warning-card .title-icon,
+    .chip-danger .inline-icon {
+      color: #ffd4d4;
+    }
+
+    .warning-card p,
+    .warning-card li {
+      color: rgba(255, 255, 255, 0.88);
+      line-height: 1.7;
+    }
+
+    .warning-card ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 28px;
+    }
+
+    .panel h2,
+    .result-card h2,
+    .reference-card h2 {
+      margin: 0 0 12px;
+      font-size: 1.5rem;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    .panel > p,
+    .reference-card > p {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .section-block + .section-block {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(6, 218, 56, 0.12);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.08rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: #10411e;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.96rem;
+      margin-bottom: 8px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid rgba(16, 65, 30, 0.14);
+      border-radius: 16px;
+      padding: 14px 16px;
+      font: inherit;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: rgba(6, 218, 56, 0.5);
+      box-shadow: 0 0 0 4px rgba(6, 218, 56, 0.12);
+    }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .check-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      border: 1px solid rgba(16, 65, 30, 0.1);
+      border-radius: 18px;
+      padding: 14px 16px;
+      background: #fbfffc;
+    }
+
+    .check-item input {
+      width: 18px;
+      height: 18px;
+      margin-top: 3px;
+      accent-color: var(--primary);
+      flex: 0 0 auto;
+    }
+
+    .check-item strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.97rem;
+    }
+
+    .check-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 15px 22px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, #1cb650 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(6, 218, 56, 0.2);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: #125d2d;
+      border: 1px solid rgba(16, 65, 30, 0.12);
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 24px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .result-card,
+    .reference-card {
+      padding: 28px;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .chip-info {
+      background: rgba(20, 121, 201, 0.12);
+      color: var(--info);
+    }
+
+    .chip-warning {
+      background: rgba(243, 156, 18, 0.15);
+      color: #b36b00;
+    }
+
+    .chip-danger {
+      background: rgba(214, 69, 69, 0.14);
+      color: #b02a2a;
+    }
+
+    .chip-warning .inline-icon {
+      color: #b36b00;
+    }
+
+    .chip-info .inline-icon {
+      color: var(--info);
+    }
+
+    .result-title {
+      margin: 0 0 10px;
+      font-size: 1.34rem;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    .result-summary,
+    .notice,
+    .list-block li,
+    .reference-card li {
+      line-height: 1.75;
+      color: #3f5348;
+    }
+
+    .notice {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #f7fbff;
+      border-left: 4px solid var(--info);
+    }
+
+    .notice .inline-icon {
+      color: var(--info);
+    }
+
+    .list-block {
+      margin-top: 18px;
+    }
+
+    .list-block h3 {
+      display: flex;
+      align-items: center;
+      margin: 0 0 10px;
+      font-size: 1rem;
+      color: #123f27;
+    }
+
+    .list-block ul,
+    .reference-card ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .reference-card li + li {
+      margin-top: 10px;
+    }
+
+    .empty-state {
+      color: var(--muted);
+    }
+
+    .footer-note {
+      max-width: 1220px;
+      margin: 26px auto 36px;
+      padding: 0 24px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1080px) {
+      .hero,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .side-stack {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page-shell {
+        padding: 18px;
+      }
+
+      .hero-card,
+      .warning-card,
+      .panel,
+      .result-card,
+      .reference-card {
+        padding: 22px;
+      }
+
+      .field-grid,
+      .check-grid,
+      .hero-points {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <div class="topbar">
+      <a class="brand" href="index.html">
+        <img src="LOGO E-DEBR.png" alt="Logo E-DEBAR">
+        <span>E-DEBAR</span>
+      </a>
+      <a class="back-link" href="index.html">Kembali ke Beranda</a>
+    </div>
+
+    <section class="hero">
+      <div class="hero-card">
+        <div class="eyebrow"><i class="fa-solid fa-stethoscope"></i>Diagnosis Obat DBD</div>
+        <h1>Skrining gejala dengue/DBD dengan rekomendasi obat suportif yang lebih aman</h1>
+        <p>Fitur ini membantu pengguna mengenali gejala yang mengarah ke dengue/DBD dan tanda bahaya yang perlu penanganan segera. Hasilnya bukan diagnosis pasti dan tidak menggantikan pemeriksaan dokter atau tes darah.</p>
+        <div class="hero-points">
+          <div class="hero-point">
+            <strong>Basis pertanyaan</strong>
+            <span>Disusun dari gejala umum dengue dan warning signs dari sumber kesehatan tepercaya.</span>
+          </div>
+          <div class="hero-point">
+            <strong>Hasil bertingkat</strong>
+            <span>Memberi status pemantauan, evaluasi medis hari ini, atau rujukan darurat.</span>
+          </div>
+          <div class="hero-point">
+            <strong>Terapi suportif</strong>
+            <span>Hanya menampilkan opsi suportif yang lazim dipakai dan lebih aman pada dugaan dengue.</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="warning-card">
+        <div>
+          <h2><i class="fa-solid fa-triangle-exclamation title-icon"></i>Perhatian penting</h2>
+          <p>DBD dapat memburuk cepat, terutama saat demam mulai turun. Bila ada tanda bahaya, pengguna tidak boleh hanya mengandalkan hasil halaman ini.</p>
+        </div>
+        <ul>
+          <li>Segera ke IGD bila ada nyeri perut hebat, muntah berulang, perdarahan, sesak, lemas berat, atau kulit dingin pucat.</li>
+          <li>Obat anti-nyeri golongan NSAID seperti ibuprofen, asam mefenamat, dan aspirin perlu dihindari pada dugaan dengue karena dapat meningkatkan risiko perdarahan.</li>
+          <li>Tes darah tetap diperlukan untuk menegakkan diagnosis.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="layout">
+      <form class="panel" id="diagnosisForm">
+        <h2><i class="fa-solid fa-notes-medical title-icon"></i>Kuisioner Gejala</h2>
+        <p>Isi sesuai kondisi saat ini. Jika ragu, pilih jawaban yang paling mendekati. Pertanyaan difokuskan pada skrining awal dengue/DBD dan penentuan tingkat kewaspadaan.</p>
+
+        <div class="section-block">
+          <div class="section-title"><i class="fa-solid fa-id-card-clip"></i>Data dasar</div>
+          <div class="field-grid">
+            <div>
+              <label for="patientName">Nama pengguna / pasien</label>
+              <input id="patientName" type="text" placeholder="Contoh: Made Putra">
+            </div>
+            <div>
+              <label for="ageGroup">Kelompok usia</label>
+              <select id="ageGroup">
+                <option value="adult">Dewasa / remaja</option>
+                <option value="child">Anak-anak</option>
+                <option value="infant">Balita / di bawah 2 tahun</option>
+              </select>
+            </div>
+            <div>
+              <label for="feverDays">Lama demam</label>
+              <select id="feverDays">
+                <option value="0">Tidak demam / tidak yakin</option>
+                <option value="1">1 hari</option>
+                <option value="2">2 hari</option>
+                <option value="3">3 hari</option>
+                <option value="4">4 hari</option>
+                <option value="5">5 hari</option>
+                <option value="6">6 hari</option>
+                <option value="7">7 hari atau lebih</option>
+              </select>
+            </div>
+            <div>
+              <label for="temperature">Suhu tertinggi</label>
+              <select id="temperature">
+                <option value="unknown">Tidak tahu</option>
+                <option value="lt38">Di bawah 38°C</option>
+                <option value="38to39">38-39°C</option>
+                <option value="gt39">Lebih dari 39°C</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-title"><i class="fa-solid fa-thermometer"></i>Gejala yang sering muncul pada dengue</div>
+          <div class="check-grid">
+            <label class="check-item">
+              <input type="checkbox" name="classicSymptom" value="headache">
+              <span><strong>Sakit kepala</strong><span>Termasuk kepala terasa berat atau nyeri hebat.</span></span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="classicSymptom" value="eyePain">
+              <span><strong>Nyeri di belakang mata</strong><span>Salah satu keluhan yang cukup khas pada dengue.</span></span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="classicSymptom" value="muscleJoint">
+              <span><strong>Nyeri otot / sendi / tulang</strong><span>Badan terasa pegal kuat atau linu menyeluruh.</span></span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="classicSymptom" value="nausea">
+              <span><strong>Mual atau muntah</strong><span>Belum termasuk muntah berulang sebagai tanda bahaya.</span></span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="classicSymptom" value="rash">
+              <span><strong>Ruam / bintik kemerahan</strong><span>Bisa muncul di kulit selama fase demam atau sesudahnya.</span></span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="classicSymptom" value="fatigue">
+              <span><strong>Lemas</strong><span>Tenaga berkurang dan aktivitas terasa lebih berat dari biasanya.</span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-title"><i class="fa-solid fa-triangle-exclamation"></i>Tanda bahaya yang perlu perhatian segera</div>
+          <div class="check-grid">
+            <label class="check-item">
+              <input type="checkbox" name="dangerSymptom" value="abdominalPain">
+              <span><strong>Nyeri perut hebat / perut sangat nyeri saat ditekan</strong><span>Tanda perburukan yang perlu evaluasi cepat.</span></span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="dangerSymptom" value="persistentVomiting">
+              <span><strong>Muntah berulang</strong><span>Kira-kira 3 kali atau lebih dalam 24 jam.</span></span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="dangerSymptom" value="mucosalBleeding">
+              <span><strong>Mimisan / gusi berdarah</strong><span>Perdarahan mukosa perlu dinilai tenaga medis.</span></span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="dangerSymptom" value="bloodVomitStool">
+              <span><strong>Muntah darah / BAB hitam atau berdarah</strong><span>Ini tanda gawat darurat.</span></span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="dangerSymptom" value="restless">
+              <span><strong>Sangat lemas, gelisah, atau mengantuk berat</strong><span>Dapat menandakan kondisi memburuk.</span></span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="dangerSymptom" value="coldSkin">
+              <span><strong>Kulit pucat, dingin, atau terasa sangat haus</strong><span>Bisa mengarah ke dehidrasi berat atau syok.</span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">Lihat Hasil Skrining</button>
+          <button type="button" class="btn-secondary" id="resetBtn">Reset Jawaban</button>
+        </div>
+      </form>
+
+      <div class="side-stack">
+        <section class="result-card" id="resultCard">
+          <h2><i class="fa-solid fa-chart-column title-icon"></i>Hasil Skrining</h2>
+          <p class="empty-state">Isi kuisioner lalu tekan <strong>Lihat Hasil Skrining</strong>. Hasil akan menampilkan tingkat kewaspadaan, saran tindakan, obat suportif yang dianjurkan, dan obat yang perlu dihindari pada dugaan dengue/DBD.</p>
+        </section>
+
+        <section class="reference-card">
+          <h2><i class="fa-solid fa-book-medical title-icon"></i>Dasar Rekomendasi</h2>
+          <p>Halaman ini mengikuti prinsip edukasi dan kewaspadaan dini, bukan pemberian resep. Dasar isinya diringkas dari referensi berikut:</p>
+          <ul>
+            <li><i class="fa-solid fa-link mini-icon"></i><a href="https://www.cdc.gov/dengue/signs-symptoms/index.html" target="_blank" rel="noopener noreferrer">CDC - Symptoms of Dengue and Testing</a></li>
+            <li><i class="fa-solid fa-link mini-icon"></i><a href="https://www.cdc.gov/dengue/treatment/index.html" target="_blank" rel="noopener noreferrer">CDC - Manage Dengue</a></li>
+            <li><i class="fa-solid fa-link mini-icon"></i><a href="https://www.who.int/publications/i/item/9789241547871" target="_blank" rel="noopener noreferrer">WHO - Dengue Guidelines for Diagnosis, Treatment, Prevention and Control</a></li>
+            <li><i class="fa-solid fa-link mini-icon"></i><a href="https://ayosehat.kemkes.go.id/topik/demam-berdarah-dengue" target="_blank" rel="noopener noreferrer">Kemenkes RI - Demam Berdarah Dengue</a></li>
+            <li><i class="fa-solid fa-link mini-icon"></i><a href="https://medlineplus.gov/druginfo/meds/a681004.html" target="_blank" rel="noopener noreferrer">MedlinePlus - Acetaminophen</a></li>
+          </ul>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <div class="footer-note">
+    Fitur ini untuk edukasi dan skrining awal. Diagnosis dengue/DBD harus ditegakkan oleh tenaga kesehatan melalui anamnesis, pemeriksaan fisik, dan bila perlu pemeriksaan laboratorium.
+  </div>
+
+  <script>
+    const form = document.getElementById('diagnosisForm');
+    const resultCard = document.getElementById('resultCard');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function getCheckedValues(name) {
+      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map((item) => item.value);
+    }
+
+    function createListBlock(title, items) {
+      if (!items.length) {
+        return '';
+      }
+
+      const titleIconMap = {
+        'Saran tindakan utama': 'fa-solid fa-hand-holding-medical',
+        'Obat / langkah suportif yang bisa dipertimbangkan': 'fa-solid fa-capsules',
+        'Obat yang perlu dihindari pada dugaan dengue': 'fa-solid fa-ban'
+      };
+
+      const iconClass = titleIconMap[title] || 'fa-solid fa-circle-info';
+
+      return `
+        <div class="list-block">
+          <h3><i class="${iconClass} inline-icon"></i>${title}</h3>
+          <ul>${items.map((item) => `<li>${item}</li>`).join('')}</ul>
+        </div>
+      `;
+    }
+
+    function buildSupportiveMedication(ageGroup, urgent) {
+      const items = [];
+
+      if (urgent) {
+        items.push('Jika pasien masih sadar, bisa minum, dan sedang menunggu transportasi ke fasilitas kesehatan, fokus utama adalah cairan sedikit-sedikit tetapi sering. Jangan menunda berangkat hanya untuk minum obat.');
+      }
+
+      if (ageGroup === 'adult') {
+        items.push('Parasetamol dapat dipakai untuk demam atau nyeri. Ikuti dosis pada kemasan. Secara umum untuk dewasa sering digunakan 500 mg tiap 4-6 jam bila perlu, dan total dari semua obat yang mengandung parasetamol tidak boleh melebihi 4.000 mg dalam 24 jam.');
+      } else if (ageGroup === 'child') {
+        items.push('Parasetamol anak boleh dipertimbangkan untuk demam atau nyeri, tetapi gunakan produk khusus anak dan ikuti tabel dosis berdasarkan berat badan pada kemasan. Ulangi hanya sesuai petunjuk kemasan, umumnya tiap 4-6 jam, dan jangan lebih dari 4 dosis dalam 24 jam.');
+      } else {
+        items.push('Untuk balita atau anak di bawah 2 tahun, pemberian obat harus lebih hati-hati. Jika demam dicurigai dengue/DBD, sebaiknya konsultasi tenaga kesehatan sebelum memberikan obat apa pun selain yang memang sudah dianjurkan dokter.');
+      }
+
+      items.push('Perbanyak cairan: air minum, oralit, kuah, atau minuman dengan elektrolit bila masih bisa minum. Minum sedikit-sedikit tetapi sering.');
+      items.push('Istirahat cukup dan pantau frekuensi kencing, muntah, serta munculnya perdarahan atau nyeri perut.');
+      return items;
+    }
+
+    function renderResult(data) {
+      const classicCount = data.classicSymptoms.length;
+      const feverDays = Number(data.feverDays);
+      const hasFever = feverDays > 0 || data.temperature === '38to39' || data.temperature === 'gt39';
+      const probableDengue = hasFever && classicCount >= 2;
+      const inCriticalWindow = feverDays >= 3 && feverDays <= 7;
+      const urgent = data.dangerSymptoms.length > 0;
+
+      let chipClass = 'chip-info';
+      let chipText = 'Pemantauan';
+      let title = 'Gejala belum cukup khas untuk skrining dengue yang kuat';
+      let summary = 'Dari jawaban saat ini, gejala belum cukup kuat untuk mengarah ke dengue/DBD secara khas. Namun demam pada daerah endemis tetap perlu dipantau, apalagi bila keluhan bertambah atau demam menetap.';
+      let actionItems = [
+        'Pantau suhu, jumlah minum, jumlah kencing, dan munculnya bintik merah atau perdarahan.',
+        'Periksa ke puskesmas atau dokter bila demam menetap, kondisi memburuk, atau muncul tanda bahaya.'
+      ];
+
+      if (probableDengue) {
+        chipClass = 'chip-warning';
+        chipText = 'Perlu Evaluasi Medis';
+        title = 'Jawaban cukup mengarah ke dugaan dengue/DBD';
+        summary = 'Terdapat pola demam disertai beberapa gejala yang sering ditemukan pada dengue/DBD. Diagnosis belum bisa dipastikan dari kuisioner saja, sehingga pasien sebaiknya diperiksa tenaga kesehatan pada hari yang sama untuk penilaian klinis dan kemungkinan tes darah.';
+        actionItems = [
+          'Periksa ke puskesmas, klinik, atau rumah sakit hari ini untuk evaluasi lebih lanjut.',
+          'Pantau terutama pada hari ke-3 sampai ke-7 demam karena fase kritis sering muncul saat suhu mulai turun.',
+          'Segera naikkan tingkat kewaspadaan bila muncul nyeri perut, muntah berulang, perdarahan, lemas berat, atau kulit dingin pucat.'
+        ];
+      }
+
+      if (urgent) {
+        chipClass = 'chip-danger';
+        chipText = 'Darurat';
+        title = 'Terdapat tanda bahaya dengue/DBD';
+        summary = 'Setidaknya ada satu tanda bahaya yang dipilih. Pada kondisi seperti ini, pasien perlu menuju IGD atau fasilitas kesehatan dengan kemampuan penanganan darurat secepatnya. Jangan hanya observasi di rumah.';
+        actionItems = [
+          'Segera ke IGD atau rumah sakit terdekat sekarang juga.',
+          'Jika memungkinkan, datang bersama pendamping dan bawa catatan lama demam, obat yang sudah diminum, serta riwayat muntah atau perdarahan.',
+          'Bila pasien tampak mengantuk berat, lemah sekali, muntah terus, atau perdarahan aktif, jangan tunda perjalanan.'
+        ];
+      }
+
+      const supportiveMedication = buildSupportiveMedication(data.ageGroup, urgent);
+      const avoidItems = [
+        'Hindari ibuprofen.',
+        'Hindari aspirin.',
+        'Hindari asam mefenamat dan obat anti-nyeri golongan NSAID lain kecuali atas arahan dokter.',
+        'Jangan menggabungkan beberapa obat berbeda yang sama-sama mengandung parasetamol karena bisa menyebabkan overdosis.'
+      ];
+
+      const patientLabel = data.patientName ? `untuk ${data.patientName}` : 'untuk pasien';
+      const criticalNotice = inCriticalWindow
+        ? '<div class="notice">Pasien berada pada rentang hari demam ke-3 sampai ke-7, yaitu periode yang perlu diawasi ketat karena pada dengue fase kritis sering muncul saat demam menurun.</div>'
+        : '';
+
+      resultCard.innerHTML = `
+        <h2><i class="fa-solid fa-chart-column title-icon"></i>Hasil Skrining</h2>
+        <div class="status-chip ${chipClass}"><i class="${urgent ? 'fa-solid fa-triangle-exclamation' : probableDengue ? 'fa-solid fa-user-doctor' : 'fa-solid fa-shield-heart'} inline-icon"></i>${chipText}</div>
+        <h3 class="result-title">${title}</h3>
+        <p class="result-summary">Ringkasan ${patientLabel}: ${summary}</p>
+        ${criticalNotice}
+        ${createListBlock('Saran tindakan utama', actionItems)}
+        ${createListBlock('Obat / langkah suportif yang bisa dipertimbangkan', supportiveMedication)}
+        ${createListBlock('Obat yang perlu dihindari pada dugaan dengue', avoidItems)}
+        <div class="notice"><i class="fa-solid fa-circle-info inline-icon"></i>Catatan penting: hasil ini bukan diagnosis. CDC menyatakan tidak ada obat khusus untuk menyembuhkan dengue; terapi utama adalah cairan, pemantauan, dan pengendalian demam/nyeri dengan pilihan yang lebih aman. Konfirmasi tetap memerlukan pemeriksaan tenaga kesehatan.</div>
+      `;
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const payload = {
+        patientName: document.getElementById('patientName').value.trim(),
+        ageGroup: document.getElementById('ageGroup').value,
+        feverDays: document.getElementById('feverDays').value,
+        temperature: document.getElementById('temperature').value,
+        classicSymptoms: getCheckedValues('classicSymptom'),
+        dangerSymptoms: getCheckedValues('dangerSymptom')
+      };
+
+      renderResult(payload);
+      resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    resetBtn.addEventListener('click', function () {
+      form.reset();
+      resultCard.innerHTML = `
+        <h2><i class="fa-solid fa-chart-column title-icon"></i>Hasil Skrining</h2>
+        <p class="empty-state">Isi kuisioner lalu tekan <strong>Lihat Hasil Skrining</strong>. Hasil akan menampilkan tingkat kewaspadaan, saran tindakan, obat suportif yang dianjurkan, dan obat yang perlu dihindari pada dugaan dengue/DBD.</p>
+      `;
+    });
+  </script>
+</body>
+</html>
