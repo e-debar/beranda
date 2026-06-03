@@ -80,43 +80,6 @@ body.blocked .popup-overlay {
       to { opacity: 1; transform: scale(1); }
     }
   </style>
-</head>
-<body>
-
-  <!-- Popup Awal -->
-  <div class="popup-overlay" id="welcomePopup">
-    <div class="popup">
-      <img src="LOGO E-DEBR.png" alt="Logo SiPre-KaDer">
-      <h1>Selamat datang di Aplikasi <br><strong>E-DEBAR</strong></h1>
-      <button onclick="closePopup()">Mulai</button>
-    </div>
-  </div>
-
-  <!-- Konten Utama -->
-  <div id="mainContent" style="display: none;">
-    <!-- Konten utama website -->
-  </div>
-
-<script>
-  // Saat popup muncul, blok interaksi dan scroll
-  document.body.classList.add("blocked");
-
-  function closePopup() {
-    const popup = document.getElementById("welcomePopup");
-    popup.classList.add("fade-out");
-
-    // Setelah animasi selesai, hilangkan popup dan aktifkan interaksi
-    setTimeout(() => {
-      popup.style.display = "none";
-      document.getElementById("mainContent").style.display = "block";
-      document.body.classList.remove("blocked");
-    }, 3); // pastikan durasinya sesuai animasi/efek
-  }
-</script>
-
-
-</body>
-
 
     <!-- Favicon -->
     <link href="img/favicon.ico" rel="icon">
@@ -142,6 +105,26 @@ body.blocked .popup-overlay {
 </head>
 
 <body>
+    <!-- Popup Awal -->
+    <div class="popup-overlay" id="welcomePopup">
+        <div class="popup">
+            <img src="LOGO E-DEBR.png" alt="Logo SiPre-KaDer">
+            <h1>Selamat datang di Aplikasi <br><strong>E-DEBAR</strong></h1>
+            <button onclick="closePopup()">Mulai</button>
+        </div>
+    </div>
+
+    <script>
+        document.body.classList.add("blocked");
+
+        function closePopup() {
+            const popup = document.getElementById("welcomePopup");
+
+            popup.style.display = "none";
+            document.body.classList.remove("blocked");
+        }
+    </script>
+
     <!-- Spinner Start -->
     <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
         <div class="spinner"></div>
