@@ -31,7 +31,7 @@
   <audio id="typingSound" src="https://assets.mixkit.co/sfx/preview/mixkit-typewriter-soft-clicks-1126.mp3"></audio>
 
   <script>
-    const greetingText="Hai Pengguna! Selamat datang di Platform SiPre‑KaDer! Ada yang bisa saya bantu?";
+    const greetingText="Hai Pengguna! Selamat datang di Website E-DEBAR! Ada yang bisa saya bantu?";
     function typeGreeting(t){const g=document.getElementById('greeting');const s=document.getElementById('typingSound');g.textContent="";let i=0;(function type(){if(i<t.length){g.textContent+=t.charAt(i);s.currentTime=0;s.play();i++;setTimeout(type,60);}})();}
     typeGreeting(greetingText);
   </script>
