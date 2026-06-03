@@ -116,131 +116,6 @@ body.blocked .popup-overlay {
 
 
 </body>
-    <!-- Floating Call Center Button & Panel (Kiri Bawah) -->
-    <!-- Floating Windy Button (Kanan Bawah) -->
-    <style>
-        .floating-windy-btn {
-            position: fixed;
-            right: 100px;
-            bottom: 32px;
-            z-index: 1200;
-            background: #06da38;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            box-shadow: 0 4px 16px rgba(6,218,56,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .floating-windy-btn:hover {
-            background: #05b336;
-        }
-        @media (max-width: 600px) {
-            .floating-windy-btn { right: 80px; bottom: 16px; }
-        }
-    </style>
-    <a class="floating-windy-btn" id="windyBtn" href="https://www.windy.com/id/-Hujan-guntur-rain?rain,-4.555,101.795,6" target="_blank" title="Cek Cuaca di Windy">
-        <i class="fas fa-cloud-sun"></i>
-    </a>
-    <style>
-        .floating-call-btn {
-            position: fixed;
-            left: 32px;
-            bottom: 32px;
-            z-index: 1200;
-            background: #06da38;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            box-shadow: 0 4px 16px rgba(6,218,56,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .floating-call-btn:hover {
-            background: #05b336;
-        }
-        .call-center-panel {
-            position: fixed;
-            left: 40px;
-            bottom: 100px;
-            z-index: 1201;
-            background: #fff;
-            color: #222;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(6,218,56,0.18);
-            padding: 20px 24px 16px 24px;
-            min-width: 260px;
-            max-width: 90vw;
-            display: none;
-            animation: fadeInUp 0.3s;
-        }
-        .call-center-panel h4 {
-            margin: 0 0 10px 0;
-            font-size: 1.1rem;
-            color: #06da38;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-        .call-center-panel ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .call-center-panel li {
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .call-center-panel .call-btn {
-            background: #06da38;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-left: 10px;
-        }
-        .call-center-panel .call-btn:hover {
-            background: #05b336;
-        }
-        .call-center-panel .close-btn {
-            position: absolute;
-            top: 8px;
-            right: 12px;
-            background: none;
-            border: none;
-            color: #888;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @media (max-width: 600px) {
-            .call-center-panel { left: 10px; right: 10px; min-width: unset; }
-            .floating-call-btn { left: 16px; bottom: 16px; }
-        }
-    </style>
 
 
     <!-- Favicon -->
@@ -695,7 +570,7 @@ body.blocked .popup-overlay {
     <!-- Quote End -->
 
 
-    <!-- 
+    <!-- Team Start 
     <div class="container-fluid py-5 wow fadeInUp" data-wow-delay="0.1s">
         <div class="container py-5">
             <div class="section-title text-center position-relative pb-3 mb-5 mx-auto" style="max-width: 600px;">
@@ -720,7 +595,7 @@ body.blocked .popup-overlay {
             </div>
         </div>
     </div>
-    Team End -->
+     Team End -->
 
     <!-- Vendor Start -->
     <div class="container-fluid py-5 wow fadeInUp" data-wow-delay="0.1s">
@@ -810,6 +685,27 @@ body.blocked .popup-overlay {
     </div>
     <!-- Footer End -->
 
+
+    <!-- Floating Call Center & Windy -->
+    <button class="floating-call-btn" id="callCenterBtn" type="button" title="Call Center Puskesmas Terdekat" aria-label="Buka call center puskesmas">
+        <i class="fas fa-phone-alt"></i>
+    </button>
+    <div class="call-center-panel" id="callCenterPanel" aria-live="polite">
+        <button class="close-btn" id="closeCallCenterBtn" type="button" title="Tutup" aria-label="Tutup call center">&times;</button>
+        <h4>Call Center Puskesmas Terdekat</h4>
+        <p class="call-center-status" id="callCenterStatus">Klik tombol lokasi untuk mengurutkan puskesmas berdasarkan jarak dari posisi Anda.</p>
+        <button class="locate-puskesmas-btn" id="locatePuskesmasBtn" type="button">
+            <i class="fa fa-map-marker-alt"></i>
+            Lacak Lokasi Saya
+        </button>
+        <ul id="puskesmasCallList">
+            <li>Data puskesmas siap dimuat.</li>
+        </ul>
+        <div class="call-center-note">Daftar disusun dari puskesmas terdekat berdasarkan koordinat lokasi pengguna.</div>
+    </div>
+    <a class="floating-windy-btn" id="windyBtn" href="https://www.windy.com/id/-Hujan-guntur-rain?rain,-4.555,101.795,6" target="_blank" rel="noopener noreferrer" title="Cek Cuaca di Windy" aria-label="Cek cuaca di Windy">
+        <i class="fas fa-cloud-sun"></i>
+    </a>
 
     <!-- Back to Top -->
     <script> window.chtlConfig = { chatbotId: "8368411893" } </script>
