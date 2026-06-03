@@ -151,6 +151,231 @@ h6,
     text-align: center;
 }
 
+.floating-call-btn,
+.floating-windy-btn {
+    position: fixed;
+    bottom: 32px;
+    z-index: 1200;
+    width: 60px;
+    height: 60px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 10px 24px rgba(6, 218, 56, 0.24);
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.floating-call-btn {
+    left: 32px;
+}
+
+.floating-windy-btn {
+    right: 100px;
+    text-decoration: none;
+}
+
+.floating-call-btn:hover,
+.floating-windy-btn:hover {
+    transform: translateY(-2px);
+    background: #05b336;
+    color: #FFFFFF;
+    box-shadow: 0 14px 30px rgba(5, 179, 54, 0.28);
+}
+
+.call-center-panel {
+    position: fixed;
+    left: 40px;
+    bottom: 104px;
+    z-index: 1201;
+    width: min(380px, calc(100vw - 32px));
+    max-height: min(560px, calc(100vh - 136px));
+    overflow-y: auto;
+    padding: 20px 22px 18px;
+    border: 1px solid rgba(6, 218, 56, 0.18);
+    border-radius: 16px;
+    background: #FFFFFF;
+    color: #222222;
+    box-shadow: 0 16px 44px rgba(9, 30, 62, 0.18);
+    display: none;
+    animation: fadeInUp 0.25s ease;
+}
+
+.call-center-panel.is-open {
+    display: block;
+}
+
+.call-center-panel h4 {
+    margin: 0 34px 8px 0;
+    color: var(--primary);
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+.call-center-status,
+.call-center-note {
+    margin: 0 0 12px;
+    color: #667085;
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.call-center-note {
+    margin: 12px 0 0;
+    font-size: 0.8rem;
+}
+
+.call-center-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 0;
+}
+
+.call-center-panel li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(9, 30, 62, 0.08);
+}
+
+.call-center-panel li:last-child {
+    border-bottom: 0;
+}
+
+.puskesmas-name {
+    display: block;
+    color: #1D2939;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.puskesmas-distance {
+    display: block;
+    margin-top: 4px;
+    color: #667085;
+    font-size: 0.8rem;
+}
+
+.puskesmas-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.call-center-panel .call-btn,
+.call-center-panel .route-btn {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 1.05rem;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.call-center-panel .call-btn {
+    background: var(--primary);
+}
+
+.call-center-panel .route-btn {
+    background: #0e7ac7;
+}
+
+.call-center-panel .call-btn:hover,
+.call-center-panel .route-btn:hover {
+    transform: translateY(-1px);
+    color: #FFFFFF;
+}
+
+.call-center-panel .call-btn:hover {
+    background: #05b336;
+}
+
+.call-center-panel .route-btn:hover {
+    background: #095e9b;
+}
+
+.call-center-panel .call-btn.is-disabled {
+    background: #98A2B3;
+    pointer-events: none;
+}
+
+.locate-puskesmas-btn {
+    width: 100%;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #FFFFFF;
+    font-weight: 800;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.locate-puskesmas-btn:hover {
+    transform: translateY(-1px);
+    background: #05b336;
+}
+
+.locate-puskesmas-btn:disabled {
+    background: #98A2B3;
+    cursor: wait;
+}
+
+.call-center-panel .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    border: 0;
+    background: transparent;
+    color: #667085;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 600px) {
+    .floating-call-btn {
+        left: 16px;
+        bottom: 16px;
+    }
+
+    .floating-windy-btn {
+        right: 16px;
+        bottom: 16px;
+    }
+
+    .call-center-panel {
+        left: 16px;
+        bottom: 88px;
+        width: calc(100vw - 32px);
+        max-height: calc(100vh - 112px);
+    }
+}
+
 /***pop up***/
 
 
